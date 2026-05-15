@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  discord-activity:
+    build: .
+    container_name: discord_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - tunnel-net
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare_tunnel
+    #restart: unless-stopped
+    # UPDATED LINE 21: Points to "discord_backend" container name
+    command: tunnel --url http://discord_backend:8000 --no-autoupdate
+    # environment:
+    #   - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    networks:
+      - tunnel-net
+
+networks:
+  tunnel-net:

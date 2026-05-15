@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Jeopardy</title>
+    
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <script src="/static/socket.io.min.js"></script>
+    <script type="module">
+        import { DiscordSDK } from "https://cdn.skypack.dev/@discord/embedded-app-sdk";
+        window.DiscordSDK = DiscordSDK;
+    </script>
+    <script src="/static/main.js" defer></script>
+</head>
+<body>
+
+    <div id="screen-menu">
+        <h1>Discord Jeopardy</h1>
+        <button id="btn-create">Create New Game</button>
+        <br>
+        <button id="btn-show-join">Join Game</button>
+    </div>
+
+    <div id="screen-join-input" class="hidden">
+        <h2>Join Game</h2>
+        <input type="text" id="input-room-code" placeholder="Room Code (4 Letters)" maxlength="4" style="text-transform:uppercase">
+        <br>
+        <input type="text" id="input-name" placeholder="Your Name">
+        <br>
+        <button id="btn-join-enter">Enter Game</button>
+        <br>
+        <button id="btn-back" style="background-color: #72767d;">Back</button>
+    </div>
+
+    <div id="screen-admin" class="hidden">
+        <h2>Room Code: <span id="room-code-display" style="color:#5865F2;"></span></h2>
+        
+        <div style="background: #2f3136; padding: 20px; border-radius: 8px;">
+            <h3>1. Upload Game File (XML)</h3>
+            <input type="file" id="file-upload" accept=".xml" style="color: white">
+            <br>
+            <button id="btn-load-game">2. Load Game Board</button>
+        </div>
+    </div>
+
+    <div id="screen-game" class="hidden">
+        <h2 id="game-status" style="margin-top: 50px;">Waiting for host...</h2>
+        <div id="game-board"></div>
+    </div>
+
+    <div id="buzzer-area" class="hidden">
+        <button id="buzzer-btn">LOCKED</button>
+    </div>
+
+    <div id="scoreboard-container" class="hidden"></div>
+
+    <div id="active-question-overlay" class="hidden">
+        <div id="question-text">Question Here</div>
+        
+        <div id="video-container" class="video-wrapper">
+            <iframe id="video-frame" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+
+        <div id="answer-text">Answer Here</div>
+        
+        <div id="admin-question-controls" class="hidden" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <div id="admin-buzzer-info" style="width: 100%; text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #ed4245;">
+                Buzzer: LOCKED
+            </div>
+            
+            <button id="btn-arm" style="background-color: #fee75c; color: black;">ARM BUZZER</button>
+            <button id="btn-reveal">Reveal Answer</button>
+            <button id="btn-close" style="background-color: #ed4245;">Close Question</button>
+        </div>
+    </div>
+
+    <div id="override-modal" class="hidden">
+      <div class="modal-content">
+        <p id="override-msg" style="font-size: 1.2rem; margin-bottom: 20px;">You are about to override an existing player in the game, do you want to continue?</p>
+        <button id="btn-override-yes" style="background-color: #ed4245;">Yes, Override</button>
+        <button id="btn-override-no" style="background-color: #72767d;">No, Cancel</button>
+      </div>
+    </div>
+
+</body>
+</html>

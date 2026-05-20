@@ -45,87 +45,85 @@ Discord Jeopardy is a real-time, interactive multiplayer trivia game designed to
     └── audio/
         └── buzz_in.mp3    # Buzzer sound effect
 (Note: Ensure you have requirements.txt, .env, and the modules/parsing.py script set up locally based on the imports in app.py).
+```
 
-⚙️ Setup & Installation
+## ⚙️ Setup & Installation
 You can run this project locally for testing or using Docker for a clean, containerized deployment.
 
-1. Environment Variables
+# 1. Environment Variables
 Create a .env file in the root directory. You will need to retrieve your Discord Client credentials from the Discord Developer Portal.
 
-Code snippet
-
+```Bash
 FLASK_SECRET_KEY=your_secure_random_secret_key
 DISCORD_CLIENT_ID=your_discord_application_client_id
 DISCORD_CLIENT_SECRET=your_discord_application_client_secret
+```
+
+
 2. Local Python Setup (Without Docker)
 Ensure you have Python 3.11+ installed.
 
 Clone the repository and navigate to the project root.
 
 Create a virtual environment:
-
-Bash
-
+```Bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
 Install the required dependencies (Make sure your requirements.txt includes Flask, Flask-SocketIO, python-dotenv, and requests):
-
-Bash
-
+```Bash
 pip install -r requirements.txt
-Run the application:
+```
 
-Bash
-
+#### Run the application:
+```Bash
 python app.py
+```
 The server will start on http://0.0.0.0:8000.
 
 3. Docker Setup (Recommended)
 Ensure Docker is installed on your machine.
 
-Build the Docker image:
-
-Bash
-
+#### Build the Docker image:
+```Bash
 docker build -t discord-jeopardy .
+```
+
 Run the Docker container, passing in your .env file and exposing port 8000:
-
-Bash
-
+```Bash
 docker run -p 8000:8000 --env-file .env discord-jeopardy
-🚀 Setting up the Discord Activity
+```
+
+## 🚀 Setting up the Discord Activity
 To use this app directly inside Discord:
 
-Go to the Discord Developer Portal and select your application.
+1. Go to the Discord Developer Portal and select your application.
 
-Navigate to URL Mapping under the Embedded App SDK section.
+2. Navigate to URL Mapping under the Embedded App SDK section.
 
-Map the base path / to your externally hosted application URL (you can use tools like ngrok or Cloudflare Tunnels to expose port 8000 for local development).
+3. Map the base path / to your externally hosted application URL (you can use tools like ngrok or Cloudflare Tunnels to expose port 8000 for local development).
 
-Launch the activity in a Discord Voice channel!
+4. Launch the activity in a Discord Voice channel!
 
-📝 Creating Custom Games (XML Format)
+## 📝 Creating Custom Games (XML Format)
 The game uses XML to structure the categories, questions, and answers. The host must upload an XML file to populate the game board.
 
 Here is the basic structure based on the provided play_test.xml:
-
-XML
-
+```xml
 <game>
     <category name="Pop Culture">
+
         <entry value="200">
             <question>This artist has the most streams on Spotify.</question>
             <answer>Taylor Swift</answer>
         </entry>
         
-        <entry value="1000">
-            <question>This publication shared the following video...</question>
-            <video>[https://www.youtube.com/watch?v=SvZmRv6U_s0](https://www.youtube.com/watch?v=SvZmRv6U_s0)</video>
-            <answer>Pitchfork</answer>
-        </entry>
     </category>
-    </game>
-Host Instructions:
+</game>
+```
+
+#### Host Instructions:
 1. Start the game to generate a Room Code.
 
 2. Upload your custom .xml file.

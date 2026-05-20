@@ -50,7 +50,7 @@ Discord Jeopardy is a real-time, interactive multiplayer trivia game designed to
 ## ⚙️ Setup & Installation
 You can run this project locally for testing or using Docker for a clean, containerized deployment.
 
-# 1. Environment Variables
+1. Environment Variables
 Create a .env file in the root directory. You will need to retrieve your Discord Client credentials from the Discord Developer Portal.
 
 ```Bash

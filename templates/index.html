@@ -36,11 +36,14 @@
 
     <div id="screen-admin" class="hidden">
         <h2>Room Code: <span id="room-code-display" style="color:#5865F2;"></span></h2>
-        
         <div style="background: #2f3136; padding: 20px; border-radius: 8px;">
-            <h3>1. Upload Game File (XML)</h3>
-            <input type="file" id="file-upload" accept=".xml" style="color: white">
+            <h3>1. Generate or Upload a Game File (XML)</h3>
+            <button id="btn-ai-generate-trivia" style="background-color: #3ba55c; margin-bottom: 15px;">
+                Generate Random Trivia XML
+            </button>
             <br>
+            <input type="file" id="file-upload" accept=".xml" style="color: white">
+            <br><br>
             <button id="btn-load-game">2. Load Game Board</button>
         </div>
     </div>

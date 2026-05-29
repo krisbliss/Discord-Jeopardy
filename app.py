@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit, join_room
 from dotenv import load_dotenv
 from modules.parsing import parse_jeopardy_xml
+from modules.ai import generate_trivia_xml
 
 load_dotenv() # pull in environment variables from .env file
 
@@ -183,6 +184,16 @@ def handle_confirm_override(data):
                     if aq.get('revealed'):
                         emit('reveal_answer_to_all',{},to=request.sid)
                 break
+
+@socketio.on('ai_generate_trivia')
+def handle_ai_generate_trivia(data):
+    room_code = data.get('room_code')
+    if rooms.get(room_code) and request.sid == rooms[room_code]['admin_sid']:
+        generated_trivia = generate_trivia_xml()
+        emit('new_trivia_generated',{
+            'xml_content':generated_trivia
+        }, to=request.sid)
+
 
 @socketio.on('upload_game')
 def handle_upload_game(data):

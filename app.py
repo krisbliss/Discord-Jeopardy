@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import os
 import random
 import string
@@ -105,7 +108,7 @@ def handle_join_room(data):
     room_code = data.get('code','').upper()
     name = data.get('name')
 
-    if room_code in room:
+    if room_code in rooms:
     # Check for duplicate player names
         existing_player = next((p for p in rooms[room_code]['players'] if p['name'] == name), None)
         if existing_player:
@@ -154,7 +157,7 @@ def handle_confirm_override(data):
             if player['name'] == name:
 
                 # update the overridden player's sid
-                players['sid'] = request.sid
+                player['sid'] = request.sid
                 join_room(room_code)
                 emit('join_success',{
                     'msg': 'Player sid override successful!'
@@ -241,7 +244,7 @@ def handle_trigger_reveal(data):
     room_code = data.get('room_code')
     if rooms.get(room_code) and request.sid == rooms[room_code]['admin_sid']:
         if rooms[room_code].get('active_question'):
-            room[room_code]['active_question']['revealed'] = True
+            rooms[room_code]['active_question']['revealed'] = True
         emit('reveal_answer_to_all', {}, to=room_code)
 
 
@@ -252,7 +255,7 @@ def handle_close(data):
     q_idx = data.get('q_idx')
 
     if rooms.get(room_code) and request.sid == rooms[room_code]['admin_sid']:
-        rooms[room_code]['game_state']['categories'][cat_idx]['question'][q_idx]['used'] = True
+        rooms[room_code]['game_state']['categories'][cat_idx]['questions'][q_idx]['used'] = True
 
         # Clear active question and lock buzzer
         rooms[room_code]['active_question'] = None
@@ -269,7 +272,7 @@ def handle_close(data):
             'buzzer_winner': None
         }, to=room_code)
 
-        dollar_value = rooms[room_code]['game_state']['categories'][cat_idx]['question'][q_idx]['value']
+        dollar_value = rooms[room_code]['game_state']['categories'][cat_idx]['questions'][q_idx]['value']
         try:
             clean_val  = int(str(dollar_value).replace('$','').replace(',',''))
             rooms[room_code]['last_question_value'] = clean_val

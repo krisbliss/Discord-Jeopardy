@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-ai-generate-trivia').addEventListener('click',()=>{
       const btn = document.getElementById('btn-ai-generate-trivia');
-      btn.innerText("Generating a new trivia board...");
-      btn.disable = true;
+      btn.innerText = "Generating a new trivia board...";
+      btn.disabled = true;
       btn.style.opacity = "0.5";
       socket.emit('ai_generate_trivia',{ room_code:currentRoomCode });
     });
@@ -227,14 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('new_trivia_generated',(data)=>{
       const btn = document.getElementById('btn-ai-generate-trivia');
       btn.innerText = "Generate Random Trivia XML";
-      btn.disable = false;
+      btn.disabled = false;
       btn.style.opacity = "1";
       
       const blob = new Blob([data.xml_content],{type:'text/xml'});
       const file = new File([blob],'ai_generate_trivia.xml',{type:'text/xml'});
 
       const dataTransfer = new DataTransfer();
-      dataTransfer.item.add(file);
+      dataTransfer.items.add(file);
       
       const fileInput = document.getElementById('file-upload');
       fileInput.files = dataTransfer.files;

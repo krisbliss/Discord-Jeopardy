@@ -1,5 +1,7 @@
-import google.generativeai as genai
 import os
+import traceback
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 
 def generate_trivia_xml():
@@ -10,10 +12,10 @@ def generate_trivia_xml():
         raise ValueError("Please set the GEMINI_API_KEY environment variable.")
 
     # Configure the Gemini API client
-    genai.configure(api_key=api_key)
+    client = genai.Client(api_key=api_key)
 
     # Instantiate the model (using gemini-1.5-flash as it is fast and excellent for text/XML generation tasks)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    #model = genai.GenerativeModel('gemini-1.5-flash')
 
     # The original XML structure provided, used as a structural reference
     reference_xml = """
@@ -26,7 +28,7 @@ def generate_trivia_xml():
             </category>
     </game>
     """
-
+    
     # Formulate the prompt instructing the model to generate similar XML
     prompt = f"""
     You are an expert trivia writer and XML data formatter.
@@ -41,22 +43,41 @@ def generate_trivia_xml():
     3. The entry values must strictly be 200, 400, 600, 800, and 1000 in order for each category.
     4. Provide a unique <question> and <answer> for each entry that matches the difficulty of the value.
     5. Output ONLY valid XML. Do not include markdown formatting like ```xml or any conversational text.
+    6. Wrap the entry XML outout in '<game>' tag.
     """
 
     # Generate the content
     try:
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.7, # A slight amount of creativity for fun trivia categories
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents = prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1, # A slight amount of creativity for fun trivia categories
             )
         )
         
+       # Clean markdown backticks just in case the model includes them
+        clean_result = response.text.replace('```xml', '').replace('```', '').strip()
+
         # Output the generated XML
-        print(response.text)
+        #with open("testOutput.txt", "w", encoding="utf-8") as f:
+        #    f.write("=== SUCCESS ===\n")
+        #    f.write(clean_result)
+            
+        return clean_result
         
     except Exception as e:
+        # Capture the full traceback and force it into the text file
+        error_trace = traceback.format_exc()
+        
+        with open("testOutput.txt", "w", encoding="utf-8") as f:
+            f.write("=== ERROR ===\n")
+            f.write(str(e) + "\n\n")
+            f.write(error_trace)
+            
         print(f"An error occurred: {e}")
+        return None
+
 
 if __name__ == "__main__":
     generate_more_trivia_xml()

@@ -86,11 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-ai-generate-trivia').addEventListener('click',()=>{
       const btn = document.getElementById('btn-ai-generate-trivia');
+      const categoriesInput = document.getElementById('input-categories').value.trim();
+
       btn.innerText = "Generating a new trivia board...";
       btn.disabled = true;
       btn.style.opacity = "0.5";
-      socket.emit('ai_generate_trivia',{ room_code:currentRoomCode });
-    });
+
+      socket.emit('ai_generate_trivia',{ 
+          room_code:currentRoomCode,
+          categories:categoriesInput
+        });
+      });
 
 
     // --- SOCKET EVENTS ---
@@ -148,15 +154,23 @@ document.addEventListener('DOMContentLoaded', () => {
             vidFrame.src = "";
         }
 
-        const aText = document.getElementById('answer-text');
-        aText.innerText = data.answer;
+        const ansText = document.getElementById('answer-text');
+        ansText.innerText = data.answer;
+        overlay.classList.remove('hidden');
+
+        const srcText = document.getElementById('source-text');
+        srcText.innerText = data.source;
         overlay.classList.remove('hidden');
 
         if (isAdmin) {
             document.getElementById('admin-question-controls').classList.remove('hidden');
-            aText.style.display = 'block';
-            aText.className = 'answer-private';
-            aText.innerHTML = "HOST VIEW: " + data.answer;
+            ansText.style.display = 'block';
+            ansText.className = 'answer-private';
+            ansText.innerHTML = "HOST VIEW: " + data.answer;
+
+            srcText.style.display = 'block';
+            srcText.className = 'answer-private';
+            srcText.innerHTML = = "HOST VIEW " + data.source;
             
             document.getElementById('buzzer-area').classList.add('hidden');
             
@@ -173,8 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('reveal_answer_to_all', () => {
-        const aText = document.getElementById('answer-text');
-        const rawAnswer = aText.innerText.replace("HOST VIEW: ", ""); 
+        const ansText = document.getElementById('answer-text');
+        const rawAnswer = ansText.innerText.replace("HOST VIEW: ", ""); 
         aText.innerText = rawAnswer;
         aText.style.display = 'block';
         aText.className = 'answer-public';

@@ -38,6 +38,9 @@
         <h2>Room Code: <span id="room-code-display" style="color:#5865F2;"></span></h2>
         <div style="background: #2f3136; padding: 20px; border-radius: 8px;">
             <h3>1. Generate or Upload a Game File (XML)</h3>
+            
+            <input type="text" id="input-categories" placeholder="Custom categories (e.g., Math; Space; History; Movies; Music)" style="margin-bottom: 15px; width: 90%; max-width: 400px;">
+            <br>
             <button id="btn-ai-generate-trivia" style="background-color: #3ba55c; margin-bottom: 15px;">
                 Generate Random Trivia XML
             </button>
@@ -67,6 +70,7 @@
         </div>
 
         <div id="answer-text">Answer Here</div>
+        <div id="source-text">Source Here</div>
         
         <div id="admin-question-controls" class="hidden" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
             <div id="admin-buzzer-info" style="width: 100%; text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #ed4245;">

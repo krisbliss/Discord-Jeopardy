@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-def generate_trivia_xml():
+def generate_trivia_xml(categories=None):
     # Ensure your Gemini API key is set as an environment variable
     # e.g., export GEMINI_API_KEY="your_api_key_here"
     api_key = os.getenv('GEMINI_API_KEY')
@@ -20,14 +20,19 @@ def generate_trivia_xml():
     # The original XML structure provided, used as a structural reference
     reference_xml = """
     <game>
-        <category name="Pop Culture">
+        <category name="History">
             <entry value="200">
-                <question>This artist has the most streams on Spotify.</question>
-                <answer>Taylor Swift</answer>
+                <question>The Statue of Liberty was a gift to the United States from this country</question>
+                <answer>France</answer>
+                <source>https://en.wikipedia.org/wiki/Statue_of_Liberty</source>
             </entry>
             </category>
     </game>
     """
+
+    category_instruction = "1. Create 5 completely new and distinct categories (e.g., 'World History', 'Science & Nature', 'Sports', 'Literature', 'Video Games')."
+    if categories:
+        category_instruction = f"1. Create exactly 5 categories strictly based on the following topics provided in this semicolon-separated list: '{categories}'."
     
     # Formulate the prompt instructing the model to generate similar XML
     prompt = f"""
@@ -38,12 +43,13 @@ def generate_trivia_xml():
     
     Generate a complete, new XML file following this exact same schema. 
     Requirements:
-    1. Create 5 completely new and distinct categories (e.g., 'World History', 'Science & Nature', 'Sports', 'Literature', 'Video Games').
+    {category_instruction}
     2. Provide exactly 5 entries per category.
     3. The entry values must strictly be 200, 400, 600, 800, and 1000 in order for each category.
     4. Provide a unique <question> and <answer> for each entry that matches the difficulty of the value.
-    5. Output ONLY valid XML. Do not include markdown formatting like ```xml or any conversational text.
-    6. Wrap the entry XML outout in '<game>' tag.
+    5. Provide a <source> tag that contains a link to a source used to determine the answer for the question.
+    6. Output ONLY valid XML. Do not include markdown formatting like ```xml or any conversational text.
+    7. Wrap the entry XML outout in '<game>' tag.
     """
 
     # Generate the content
@@ -60,9 +66,9 @@ def generate_trivia_xml():
         clean_result = response.text.replace('```xml', '').replace('```', '').strip()
 
         # Output the generated XML
-        #with open("testOutput.txt", "w", encoding="utf-8") as f:
-        #    f.write("=== SUCCESS ===\n")
-        #    f.write(clean_result)
+        # whith open("testOutput.txt", "w", encoding="utf-8") as f:
+        #     f.write("=== SUCCESS ===\n")
+        #     f.write(clean_result)
             
         return clean_result
         

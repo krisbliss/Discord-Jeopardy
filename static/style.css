@@ -118,7 +118,7 @@ input {
     max-width: 90%; 
 }
 
-#answer-text { 
+#answer-text, #source-text{ 
     font-size: 2em; 
     margin-top: 30px; 
     display: none; 

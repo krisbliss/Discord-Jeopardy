@@ -14,6 +14,17 @@ from modules.ai import generate_trivia_xml
 load_dotenv() # pull in environment variables from .env file
 
 app = Flask(__name__)
+@app.after_request
+def add_security_headers(response):
+    # Explicitly allow Discord and the Discord proxy to frame your application
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://*.discord.com https://*.discordsays.com;"
+    
+    # Remove X-Frame-Options if it was injected by another service
+    if 'X-Frame-Options' in response.headers:
+        del response.headers['X-Frame-Options']
+        
+    return response
+
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'default_secret')
 socketio = SocketIO(app, cors_allowed_origins="*")  # allow cross-origin requests from all sources
 
@@ -191,8 +202,11 @@ def handle_confirm_override(data):
 @socketio.on('ai_generate_trivia')
 def handle_ai_generate_trivia(data):
     room_code = data.get('room_code')
+    categories = data.get('categories')
+
     if rooms.get(room_code) and request.sid == rooms[room_code]['admin_sid']:
-        generated_trivia = generate_trivia_xml()
+        generated_trivia = generate_trivia_xml(categories)
+
         emit('new_trivia_generated',{
             'xml_content':generated_trivia
         }, to=request.sid)
@@ -232,6 +246,7 @@ def handle_reveal(data):
             'answer': question_data['answer'],
             'value': question_data['value'],
             'video_id': question_data.get('video_id'),
+            'source': question_data['source'],
             'cat_idx': cat_idx,
             'q_idx': q_idx,
             'revealed': False # default state before admin reveals answer

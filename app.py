@@ -181,7 +181,7 @@ def handle_confirm_override(data):
                 }, to=request.sid)
 
                 emit('buzzer_state',{
-                    'locked': room[room_code].get('buzzer_locked',True),
+                    'locked': rooms[room_code].get('buzzer_locked',True),
                     'winner': rooms[room_code].get('buzzer_winner')
                 }, to=request.sid)
 
@@ -246,7 +246,7 @@ def handle_reveal(data):
             'answer': question_data['answer'],
             'value': question_data['value'],
             'video_id': question_data.get('video_id'),
-            'source': question_data['source'],
+            'source': question_data.get('source','Trust Me Bro'),
             'cat_idx': cat_idx,
             'q_idx': q_idx,
             'revealed': False # default state before admin reveals answer

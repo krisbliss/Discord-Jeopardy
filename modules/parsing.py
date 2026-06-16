@@ -56,7 +56,7 @@ def parse_jeopardy_xml(xml_string):
                     'value': entry.get('value'),
                     'question': entry.find('question').text,
                     'answer': entry.find('answer').text,
-                    **({'source': source_node.text} if source_node is not None else {}), # conditional dict unpacker
+                    'source': source_node.text if source_node is not None else 'Trust me bro',
                     'video_id': vid_id,
                     'video_start': vid_start,
                     'used': False

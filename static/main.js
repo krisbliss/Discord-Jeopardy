@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             srcText.style.display = 'block';
             srcText.className = 'answer-private';
-            srcText.innerHTML = = "HOST VIEW " + data.source;
+            srcText.innerHTML = "HOST VIEW " + data.source;
             
             document.getElementById('buzzer-area').classList.add('hidden');
             
@@ -179,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
             info.style.color = "#ed4245"; 
         } else {
             document.getElementById('admin-question-controls').classList.add('hidden');
-            aText.style.display = 'none';
-            aText.className = '';
+            ansText.style.display = 'none';
+            ansText.className = '';
             
             document.getElementById('buzzer-area').classList.remove('hidden');
         }
@@ -189,9 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('reveal_answer_to_all', () => {
         const ansText = document.getElementById('answer-text');
         const rawAnswer = ansText.innerText.replace("HOST VIEW: ", ""); 
-        aText.innerText = rawAnswer;
-        aText.style.display = 'block';
-        aText.className = 'answer-public';
+        ansText.innerText = rawAnswer;
+        ansText.style.display = 'block';
+        ansText.className = 'answer-public';
     });
 
     socket.on('hide_question', (data) => {

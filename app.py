@@ -262,6 +262,41 @@ def handle_trigger_reveal(data):
             rooms[room_code]['active_question']['revealed'] = True
         emit('reveal_answer_to_all', {}, to=room_code)
 
+@socketio.on('trigger_share_source')
+def handle_trigger_share(data):
+    room_code = data.get('room_code')
+    channel_id = data.get('channel_id')
+    
+    if rooms.get(room_code) and request.sid == rooms[room_code]['admin_sid']:
+        active_q = rooms[room_code].get('active_question')
+        
+        if active_q:
+            source_text = active_q.get('source')
+            bot_token = os.getenv('DISCORD_BOT_TOKEN')
+            
+            url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
+            headers = {
+                "Authorization": f"Bot {bot_token}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "content": f"📖 **Source Revealed:**\n{source_text}"
+            }
+            
+            response = None
+            try:
+                # Send the POST request to Discord's API
+                response = requests.post(url, headers=headers, json=payload)
+                response.raise_for_status() # Raises an error if the HTTP request fails
+                
+                # Optional: Let the admin know it successfully sent
+                # emit('success', {'msg': 'Source dropped in chat!'}, to=request.sid)
+                
+            except requests.exceptions.RequestException as e:
+                print(f"Failed to send Discord message: {e}")
+                if response is not None:
+                    print(f"Discord Response: {response.text}")
+
 
 @socketio.on('close_question')
 def handle_close(data):
@@ -353,6 +388,15 @@ def handle_player_buzz(data):
             'players':rooms[room_code]['players'],
             'buzzer_winner': winner_name
         },to=room_code)
+
+@socketio.on('log_frontend_err')
+def handle_frontend_error(data):
+    # Retrieve the message sent from the JavaScript
+    error_message = data.get('msg', 'Unknown frontend error occurred.')
+    
+    # Print it to the Python console so Docker captures it
+    print(f"[FRONTEND ERROR] {error_message}", flush=True)
+
 
 if __name__ == '__main__':
     socketio.run(app,debug=True, port=8000, host='0.0.0.0')

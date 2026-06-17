@@ -1,5 +1,23 @@
+let discordSDK = null;
+
+document.addEventListener('DOMContentLoaded', async() => {
+    const clientId = "1469903552494174208";
+      if (window.DiscordSDK) {
+        discordSDK = new window.DiscordSDK(clientId);
+        
+        // 3. Wait for the SDK to be ready so it can populate the channelId
+        try {
+            await discordSDK.ready();
+            console.log("Discord SDK is ready! Channel ID:", discordSDK.channelId);
+        } catch (error) {
+            console.error("Failed to initialize Discord SDK:", error);
+        }
+      }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-    const socket = io({ transports: ['websocket', 'polling'] });
+    const socket = io({ transports: ['websocket', 'polling'] 
+});
     let currentRoomCode = "";
     let isAdmin = false;
     let currentCatIdx = -1;
@@ -9,16 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const buzzSound = new Audio('/static/audio/buzz_in.mp3');
     buzzSound.volume = 0.5;
 
-    // --- REJOIN LOGIC (Check saved room code) ---
-    //const savedRoom = sessionStorage.getItem('rejoin_room_code');
-    // if (savedRoom) {
-    //     document.getElementById('input-room-code').value = savedRoom;
-    //     document.getElementById('screen-menu').classList.add('hidden');
-    //     document.getElementById('screen-join-input').classList.remove('hidden');
-    //     sessionStorage.removeItem('rejoin_room_code');
-    // }
 
-    // --- LISTENERS ---
+// --- LISTENERS ---
     document.getElementById('btn-create').addEventListener('click', () => socket.emit('create_room'));
 
     document.getElementById('btn-show-join').addEventListener('click', () => {
@@ -45,7 +55,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-reveal').addEventListener('click', () => {
+        const btn = document.getElementById('btn-reveal-source');
+        btn.disabled = false;
+        btn.style.opacity ="1";
         socket.emit('trigger_reveal_answer', { room_code: currentRoomCode });
+    });
+    
+    document.getElementById('btn-reveal-source').addEventListener('click',() => {
+        const btn = document.getElementById('btn-reveal-source');
+        if(typeof discordSDK !== 'undefined' && discordSDK && discordSDK.channelId){
+          btn.disabled = true;
+          btn.style.opacity = "0.5";
+
+          socket.emit('trigger_share_source',{
+            'room_code': currentRoomCode,
+            'channel_id':discordSDK.channelId
+          });
+        }else{
+          alert("Cannot share source: You must be actively running this game inside a Discord Voice Channel to drop messages in the chat.");
+          btn.disabled = false;
+          btn.style.opacity = "1";
+          socket.emit('log_frontend_err', {
+            msg: "Share Source Failed: discordSDK or channelId is undefined. Testing in standard browser?"
+          });
+        }
     });
 
     document.getElementById('btn-close').addEventListener('click', () => {
@@ -95,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
       socket.emit('ai_generate_trivia',{ 
           room_code:currentRoomCode,
           categories:categoriesInput
-        });
       });
+    });
 
 
     // --- SOCKET EVENTS ---
@@ -167,22 +200,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ansText.style.display = 'block';
             ansText.className = 'answer-private';
             ansText.innerHTML = "HOST VIEW: " + data.answer;
-
+            
             srcText.style.display = 'block';
             srcText.className = 'answer-private';
-            srcText.innerHTML = "HOST VIEW " + data.source;
-            
-            document.getElementById('buzzer-area').classList.add('hidden');
-            
-            const info = document.getElementById('admin-buzzer-info');
-            info.innerText = "Buzzer: LOCKED";
-            info.style.color = "#ed4245"; 
-        } else {
-            document.getElementById('admin-question-controls').classList.add('hidden');
-            ansText.style.display = 'none';
-            ansText.className = '';
-            
-            document.getElementById('buzzer-area').classList.remove('hidden');
+            srcText.innerHTML = "HOST VIEW: " + data.source;
+
+            const btn_show_src = document.getElementById('btn-reveal-source');
+            btn_show_src.disabled = true;
+            btn_show_src.style.opacity = "0.5";
         }
     });
 
@@ -273,6 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let q = 0; q < numQuestions; q++) {
                 categories.forEach((cat, catIdx) => {
                     const qData = cat.questions[q];
+                    if(!qData) return;
+
                     const tile = document.createElement('div');
                     tile.className = 'question-tile';
                     tile.id = `tile-${catIdx}-${q}`;

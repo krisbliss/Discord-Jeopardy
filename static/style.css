@@ -180,9 +180,25 @@ input {
     transition: all 0.2s; 
 }
 
-.player-name { font-weight: bold; color: #fff; margin-bottom: 5px; font-size: 0.9rem; }
-.player-score { font-size: 1.2rem; color: #ffcc00; font-family: monospace; }
-.score-controls { display: flex; gap: 10px; margin-top: 5px; align-items: center;}
+.player-name { 
+    font-weight: bold; 
+    color: #fff; 
+    margin-bottom: 5px; 
+    font-size: 0.9rem; 
+}
+
+.player-score { 
+    font-size: 1.2rem; 
+    color: #ffcc00; 
+    font-family: monospace; 
+}
+
+.score-controls { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 5px; 
+    align-items: center;
+}
 
 .btn-score { 
     padding: 2px 8px; 
@@ -192,8 +208,15 @@ input {
     box-shadow: 0 3px 0 rgba(0,0,0,0.3);
 }
 
-.btn-score:hover { transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
-.btn-score:active { transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0.3); }
+.btn-score:hover { 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3); 
+}
+
+.btn-score:active { 
+    transform: translateY(3px); 
+    box-shadow: 0 0 0 rgba(0,0,0,0.3); 
+}
 
 /* --- CENTERED & RESPONSIVE BUZZER STYLES --- */
 #buzzer-area {

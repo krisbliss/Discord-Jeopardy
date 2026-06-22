@@ -6,7 +6,7 @@ import random
 import string
 import requests
 from flask import Flask, render_template, request, jsonify
-from flask_socketio import SocketIO, emit, join_room
+from flask_socketio import SocketIO, emit, join_room, close_room
 from dotenv import load_dotenv
 from modules.parsing import parse_jeopardy_xml
 from modules.ai import generate_trivia_xml
@@ -392,11 +392,36 @@ def handle_player_buzz(data):
 @socketio.on('log_frontend_err')
 def handle_frontend_error(data):
     # Retrieve the message sent from the JavaScript
-    error_message = data.get('msg', 'Unknown frontend error occurred.')
+    error_message = data.get('msg', 'Host left the game.')
     
     # Print it to the Python console so Docker captures it
     print(f"[FRONTEND ERROR] {error_message}", flush=True)
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    # request.sid is the unique session ID of the user disconnecting
+    user_sid = request.sid 
+    room_to_delete = None
+
+    # 1. Search for the room where this user is the admin
+    for room_code, room_data in list(rooms.items()):
+        # Assuming your room_data stores the admin's session ID or user ID
+        if room_data.get('admin_sid') == user_sid:
+            room_to_delete = room_code
+            break
+
+    # 2. If an admin disconnected, delete the room
+    if room_to_delete:
+        # Optional: Tell the remaining players the game is dead before destroying the room
+        emit('error', {'msg': 'The host has left the game. Room closed.'}, room=room_to_delete)
+        
+        # Force all SocketIO clients to leave the channel
+        close_room(room_to_delete)
+        
+        # Remove the room from your Python dictionary
+        del rooms[room_to_delete]
+        
+        print(f"Server: Room {room_to_delete} was deleted because the admin left.", flush=True)
 
 if __name__ == '__main__':
     socketio.run(app,debug=True, port=8000, host='0.0.0.0')

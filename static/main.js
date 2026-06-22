@@ -189,11 +189,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ansText = document.getElementById('answer-text');
         ansText.innerText = data.answer;
-        overlay.classList.remove('hidden');
+        ansText.style.display = 'none';
 
         const srcText = document.getElementById('source-text');
         srcText.innerText = data.source;
+        srcText.style.display = 'none';
+
         overlay.classList.remove('hidden');
+
+        if(!isAdmin){
+          document.getElementById('buzzer-area').classList.remove('hidden');
+        }
 
         if (isAdmin) {
             document.getElementById('admin-question-controls').classList.remove('hidden');
@@ -261,6 +267,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 info.style.color = "#ed4245"; 
             }
         }
+    });
+    
+    socket.on('error',(data)=>{
+      const toast = document.getElementById('error-toast');
+      const toastMsg = document.getElementById('error-toast-msg');
+
+      toastMsg.textContent = data.msg;
+      toast.classList.remove('hidden');
     });
 
     socket.on('new_trivia_generated',(data)=>{

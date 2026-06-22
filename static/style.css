@@ -305,3 +305,18 @@ input {
     max-width: 400px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
+
+#error-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4d4d; /* Bright red for visibility */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 9999; /* Ensures it stays on top of the game board */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: opacity 0.3s ease-in-out;
+}
